@@ -66,7 +66,7 @@ class InteractiveDemo:
         self._docks = tk.Entry(w)
         self._docks.insert(tk.END, docks)
         self._gps = tk.Entry(w)
-        self._gps.insert(tk.END, "59.915096,10.7312715")
+        self._gps.insert(tk.END, str(gps_location))
        
         self._bikes.grid(row=0, column=1)
         self._docks.grid(row=1, column=1)
@@ -79,5 +79,4 @@ class InteractiveDemo:
         return int(self._docks.get())
 
     def location(self):
-        l = self._gps.get().split(",")
-        return BySykkelModel.GPSLocation(float(l[0]), float(l[1]))
+        return self._gps.get()
