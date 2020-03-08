@@ -22,14 +22,16 @@ def fixed_map(style, option):
       elm[:2] != ('!disabled', '!selected')]
 
 '''
-Main
+Enjoy the ride
 '''
 
 args = BySykkelParams.parser.parse_args()
 
-window = tk.Tk()
-w1 = tk.PanedWindow(window)
-w1.pack(fill=tk.BOTH, expand=1)
+mainWindow = tk.Tk()
+
+
+currentPositionPane = tk.PanedWindow(mainWindow)
+currentPositionPane.pack(fill=tk.BOTH, expand=1)
 
 '''
 See fixed_map above for the explanation
@@ -45,47 +47,70 @@ model = BySykkelModel.Source(args.gbfs, args.client_id)
 '''
 Update window with system information 
 '''
-window.title(model.system.format("Operert av {0}.\tSpørsmål? Ring {1} eller send epost to {2}"))
+mainWindow.title(model.system.format("Operert av {0}.\tSpørsmål? Ring {1} eller send epost to {2}"))
 
 '''
 Create TreeView 
 '''
-view = BySykkelView.TreeView(window, model, "Treeview")
+view = BySykkelView.TreeView(mainWindow, model, "Treeview")
+
+'''
+Current Location Label
+'''
 current_location = tk.StringVar()
+current_location_label = tk.Label(currentPositionPane, textvariable=current_location)
 current_location.set(args.location)
-current_location_label = tk.Label(w1, textvariable=current_location)
-w1.add(current_location_label)
+currentPositionPane.add(current_location_label)
 
 def get_current_position():
     '''
     This is only a placeholder
+    Alas
     '''
     return BySykkelModel.GPSLocation.parse(current_location.get())
 
 def demo():
-    current_location.set(str(test.location()))
-    view.update(test.bikes(), test.docks(), test.location())
+    '''
+    Update by request using interactive demo settings
+    (+)Update also current_location so it will look nice
+    '''
+    current_location.set(test.location())
+    view.update(test.bikes(), test.docks(), get_current_position())
   
 
 def update():
+    '''
+    Constant update using setup parameters and current location
+    '''
     view.update(args.bikes, args.docks, get_current_position())
-    window.after(args.interval*1000, update)
+    mainWindow.after(args.interval*1000, update)
 
 
 if args.demo:
-    w2 = tk.PanedWindow(window) 
-    w2.pack(fill=tk.X, expand=1)
-    run_demo_button = tk.Button(w2, text="Interaktiv Demo\n(trykk her)", command=demo)
-    w2.add(run_demo_button)
-    w3 = tk.PanedWindow(w2)
-    w2.add(w3)
-    test = BySykkelView.InteractiveDemo(w3, args.bikes, args.docks, 
-                                        BySykkelModel.GPSLocation.parse(args.location))
+    '''
+    Create Interactive Demo section (--demo option)
+    Ugly code to separate button from the rest of the settings
+    '''
+    demoPane = tk.PanedWindow(mainWindow) 
+    demoPane.pack(fill=tk.X, expand=1)
+    demo_label = tk.Label(demoPane, text="Interaktiv Demo")
+    demoPane.add(demo_label)
+    
+    demoSettingsPane = tk.PanedWindow(demoPane)
+    demoPane.add(demoSettingsPane)
+    test = BySykkelView.InteractiveDemo(demoSettingsPane, 
+                                        args.bikes, args.docks, 
+                                        get_current_position())
 
-    window.after(0, demo)
+    demo_button = tk.Button(demoPane, text="Trykk Her", command=demo)
+    demoPane.add(demo_button)
+
+    mainWindow.after(0, demo)
 
 else:
-    
-    window.after(0, update)
+    '''
+    Start constant update
+    '''
+    mainWindow.after(0, update)
 
-window.mainloop()
+mainWindow.mainloop()

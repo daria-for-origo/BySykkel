@@ -13,6 +13,7 @@ to edit data and create various test cases.
 (Full coverage test is out of the scope for this project due to time restrictions)
 
 Look for <Offline Test> in the project for more info
+NB! Use --gbfs offline/gbfs.json for offline test
 '''
 
 def get_content(file, client):

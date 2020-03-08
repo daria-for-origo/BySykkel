@@ -52,9 +52,6 @@ class TreeView(tk.ttk.Treeview):
 class InteractiveDemo:
     '''
     Module for interactive test of BySykkelModel/BySykkelView
-    There are 3 parameters that changes Model/View bahaviour
-
-    
     '''
     def  __init__(self, w, bikes, docks, gps_location):
         tk.Label(w, text="Sykkler").grid(row=0, column=0)
