@@ -1,30 +1,34 @@
-# BySykkel
+BySykkel
+========
 Retrieve city bicycle stands information for public API
 
-
-#How to use
-
-## Windows 
-
-### Requirements 
-#### Python 3.6 and up
-
-### Usage
-
-python ride/main.py 
+* User has to provide a path to auto-discovery file in gbfs format.
+* By default, Oslo City Information is retrieved and presented
+* List of bicycle stations is sorted by the distance from the user
+* Demo version allows manual update of the current user position
+* Automated version current position is only a place holder for now
 
 
-## Ubuntu on Windows 10
-### Requirements
 
-apt-get install python3
-apt-get install python3-tk
+## Usage
 
-install XMing on windows
+* python(3) ride/main.py --help
+* python(3) ride/main.py --demo
 
-echo "export DISPLAY:=0" >> ~/.bashrc
 
-and only then
+## Windows Notes 
 
-python3 ride/main.py
+* Python 3.6 and up
 
+
+## Ubuntu on Windows 10 Notes
+
+* install XMing on windows
+
+* apt-get install python3
+* apt-get install python3-tk (Sic!)
+* echo "export DISPLAY:=0" >> ~/.bashrc
+
+## Linux
+
+* TBD

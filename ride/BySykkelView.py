@@ -11,7 +11,7 @@ class TreeView(tk.ttk.Treeview):
     '''
     def __init__(self, window, model, style):
         self.model = model
-        cols = ['Stasjon', 'KM', 'Sykkler', 'Ledige Plasser', 'Adresse']
+        cols = [model.system.name + " Stasjoner", 'Avstand', 'Sykkler', 'Ledige Plasser', 'Adresse']
         super().__init__(window, columns=cols[1:], style=style, show='tree')
         vsb = tkinter.ttk.Scrollbar(window, orient="vertical", command=self.yview)
         vsb.pack(side='right', fill='y')
@@ -25,13 +25,16 @@ class TreeView(tk.ttk.Treeview):
         self.root = self.insert("", 1, text=cols[0], values=cols[1:], open=True)
 
         self.tag_configure('filter', foreground='gray')
+
+        self.pack(side=tk.TOP,fill=tk.BOTH, expand=True)
+
           
-    def update(self, bikes, docks, lat, lon):        
+    def update(self, bikes, docks, gps_location):        
         '''
         Triggers full treeview re-load
         If model can not be reloaded, the view will remain unchanged
         '''
-        if self.model.update(BySykkelModel.GPSLocation(lat, lon)):
+        if self.model.update(gps_location):
             self.delete(*self.get_children(self.root))
             for row in self.model.status:
                 row_tags = list()
@@ -43,26 +46,38 @@ class TreeView(tk.ttk.Treeview):
                     '''
                     row_tags.append('filter')
                 self.insert(self.root, "end", text=row.name, tags = row_tags, \
-                    values=("{:.3f}".format(row.distance), row.bikes, row.docks, row.address))
+                    values=("{:.3f} km".format(row.distance), row.bikes, row.docks, row.address))
 
 
-class InteractiveInput:
-   def  __init__(self, w):
-        tk.Label(w, text="Min bikes").grid(row=0)
-        tk.Label(w, text="Min docks").grid(row=1)
-        tk.Label(w, text="Latitude").grid(row=2)
-        tk.Label(w, text="Longitude").grid(row=3)
+class InteractiveDemo:
+    '''
+    Module for interactive test of BySykkelModel/BySykkelView
+    There are 3 parameters that changes Model/View bahaviour
 
-        self.bikes = tk.Entry(w)
-        self.bikes.insert(tk.END, "1")
-        self.docks = tk.Entry(w)
-        self.docks.insert(tk.END, "1")
-        self.lat = tk.Entry(w)
-        self.lat.insert(tk.END, "59.915096")
-        self.lon = tk.Entry(w)
-        self.lon.insert(tk.END, "10.7312715")
+    
+    '''
+    def  __init__(self, w, bikes, docks, gps_location):
+        tk.Label(w, text="Sykkler").grid(row=0, column=0)
+        tk.Label(w, text="Plasser").grid(row=1, column=0)
+        tk.Label(w, text="GPS Lokasjon").grid(row=0, column=2)
 
-        self.bikes.grid(row=0, column=1)
-        self.docks.grid(row=1, column=1)
-        self.lat.grid(row=2, column=1)
-        self.lon.grid(row=3, column=1)
+        self._bikes = tk.Entry(w)
+        self._bikes.insert(tk.END, bikes)
+        self._docks = tk.Entry(w)
+        self._docks.insert(tk.END, docks)
+        self._gps = tk.Entry(w)
+        self._gps.insert(tk.END, "59.915096,10.7312715")
+       
+        self._bikes.grid(row=0, column=1)
+        self._docks.grid(row=1, column=1)
+        self._gps.grid(row=0, column=3)
+
+    def bikes(self):
+        return int(self._bikes.get())
+
+    def docks(self):
+        return int(self._docks.get())
+
+    def location(self):
+        l = self._gps.get().split(",")
+        return BySykkelModel.GPSLocation(float(l[0]), float(l[1]))

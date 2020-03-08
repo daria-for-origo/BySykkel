@@ -18,8 +18,9 @@ class GPSLocation:
         self.lat = lat
         self.lon = lon
 
+
     def __str__(self):
-        return "{" + str(self.lat) + "," + str(self.lon) + "}"
+        return "[" + str(self.lat) + "," + str(self.lon) + "]"
 
     def distance(self, other):
         '''
@@ -32,6 +33,13 @@ class GPSLocation:
         olat = radians(other.lat)
         olon = radians(other.lon)
         return 6371.01 * acos(sin(slat)*sin(olat) + cos(slat)*cos(olat)*cos(slon - olon))
+
+    def parse(input):
+        '''
+        Parse "[ lat, lon ]" string 
+        '''
+        pair = eval(input)
+        return GPSLocation(pair[0], pair[1])
 
 
 class GbfsImfo:
@@ -79,6 +87,7 @@ class SystemInfo:
         try:
             js = json.loads(BySykkelData.get_content(url, client_id))
             self.operator = js["data"]["operator"]
+            self.name = js["data"]["name"]
             self.phone_number = js["data"]["phone_number"]
             self.email = js["data"]["email"]
         except Exception as ex:
