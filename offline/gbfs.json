@@ -1,0 +1,22 @@
+{
+  "data":{
+    "nb":{
+      "feeds":[
+        {
+          "url":"offline/system_info.json",
+          "name":"system_information"
+        },
+        {
+          "url":"offline/station_info.json",
+          "name":"station_information"
+        },
+        {
+          "url":"offline/station_status.json",
+          "name":"station_status"
+        }
+      ]
+    }
+  },
+  "ttl":10,
+  "last_updated":1553592630
+}
