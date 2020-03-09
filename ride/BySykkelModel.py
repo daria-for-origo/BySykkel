@@ -160,6 +160,13 @@ class StationStatus:
     def sortKey(self):
         return self.distance
 
+    def format(self, template="{0}\t{1}\t{2}\t{3}\t{4}\{5}"):
+        return template.format(self.name, self.distance, self.location.lat, self.location.lon, self.bikes, self.docks)
+
+    def __str__(self):
+        return self.format()
+
+
 class Source:
     '''
     BySykkel real time data put together 
@@ -244,7 +251,7 @@ class Source:
        
         return True
     
-    def sort(self) :
+    def sort(self):
         '''
         Seems silly to provide a sort in a model nowdays when
         so many widgets can do the same, but for those who can find it usefull ...
