@@ -33,4 +33,9 @@ Retrieve city bicycle stands information for public API
 
 ## Linux
 
-* TBD
+Presumably, the only requirement for any linux environment is python3. Having said that, I hadn't tried
+
+
+## macOS
+
+Is a unicorn
