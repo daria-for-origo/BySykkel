@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.ttk 
 
-import BySykkelModel
+import ride.BySykkelModel
 
 class TreeView(tk.ttk.Treeview):
     '''

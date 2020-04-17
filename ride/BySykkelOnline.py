@@ -1,6 +1,6 @@
 import traceback
 from urllib.request import Request, urlopen
-from BySykkelError import print_exception, print_error
+from ride.BySykkelError import print_exception, print_error
 
 '''
 https://oslobysykkel.no/apne-data/sanntid
@@ -12,11 +12,21 @@ deretter en strek og navn på applikasjonen,
 som mittfirma-reiseplanlegger eller mittfirma-bymonitor.
 '''
 
-def get_content(url, client):
+def get_content(url, client_id):
+
+    if client == "":
+        print_error("Mandatory parameter Client-ID is missing")
+        return "{}" 
+
+    if len(client) < 7:
+        print_error("Client-ID is too short")
+        return "{}" 
+    
     try:
         req = Request(url)
-        req.add_header('Client-Identifier', client)
+        req.add_header('Client-Identifier', client_id)
         return urlopen(req).read()
     except Exception as ex:
+        ex.args  += (url,)
         print_exception(ex, traceback.format_exc())
         return "{}"

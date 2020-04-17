@@ -1,22 +1,29 @@
 import traceback
 import json
 
-'''
-<Offline Test> option
-Uncomment next and comment import BySykkelOnline line
-'''
-#import BySykkelOffline as BySykkelData
-import BySykkelOnline as BySykkelData
+import BySykkelConfig
+
+if BySykkelConfig.OfflineRun:
+    import ride.BySykkelOffline as BySykkelData
+else:
+    import ride.BySykkelOnline as BySykkelData
 
 from math import radians, sin, cos, acos
 from datetime import datetime
-from BySykkelError import print_exception, print_error
+from ride.BySykkelError import print_exception, print_error
 
     
 class GPSLocation:
     def __init__(self, lat, lon):
         self.lat = lat
         self.lon = lon
+
+    def __eq__(self, other):
+        
+       return (self.lat == other.lat) and (self.lon == other.lon)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
     def __str__(self):
@@ -42,7 +49,7 @@ class GPSLocation:
         return GPSLocation(pair[0], pair[1])
 
 
-class GbfsImfo:
+class GbfsInfo:
     '''
     Auto-discovery-fil som lenker til alle de andre filene som er publisert av systemet.
     See https://oslobysykkel.no/apne-data/sanntid
@@ -137,14 +144,12 @@ class StationStatus:
     def __init__(self, station_info):
         self.bikes = 0
         self.docks = 0
-        self.distance = 0
-        self.name = "O Brother, Where Art Thou?"  
-        try:
-            self.name = station_info["name"]
-            self.address = station_info["address"]
-            self.location = GPSLocation(station_info["lat"], station_info["lon"])
-        except Exception as ex:
-            print_exception(ex, traceback.format_exc())
+        self.distance = 0 
+        self.name = station_info.get("name", "")
+        self.address = station_info.get("address", "")
+        lat = station_info.get("lat", 0)
+        lon = station_info.get("lon", 0)
+        self.location = GPSLocation(float(lat), float(lon))
             
     def __str__(self):
         template = "{0}:{1},{2},{3}"
@@ -173,7 +178,7 @@ class Source:
     '''
     def __init__(self, gbfs_url, client_id):
         self.client_id = client_id
-        self.gbfs = GbfsImfo(gbfs_url, client_id)
+        self.gbfs = GbfsInfo(gbfs_url, client_id)
         self.system = SystemInfo(self.gbfs.system_info_url, client_id)
         self.info = dict()
         self.status = list()
@@ -198,9 +203,10 @@ class Source:
         try:
             js = json.loads(BySykkelData.get_content(self.gbfs.station_info_url, self.client_id))
             si = StationDict(js)
-            if (si.timestamp <= self.status_timestamp):
+            if (si.timestamp <= self.info_timestamp):
                 return False
             self.info.clear()
+            self.info_timestamp = si.timestamp
             for key, info in si.dictionary.items():
                 self.info[key] = StationStatus(info)
         except Exception as ex:
@@ -219,16 +225,16 @@ class Source:
         if (not force_update and ss.timestamp <= self.status_timestamp):
             return False 
         self.status.clear()
+        self.status_timestamp = ss.timestamp
         for key, info in ss.dictionary.items():
             try:
                 s = self.info[key]
                 s.update_status(info)
                 self.status.append(s)
             except KeyError:
-                s = StationStatus({})
-                s.update_status(info)
-                self.status.append(s) # Interesting to see how many key errors are there
+                continue
             except Exception as ex:
+                ex.args += (key, info,)
                 print_exception(ex, traceback.format_exc())
                 return False
         return True

@@ -23,6 +23,9 @@ parser.add_argument('--interval', dest='interval',  type=int, default=10,
 parser.add_argument('--demo', dest='demo', action='store_true',
                     help='interaktiv demo (bare manuell oppdatering)')
 
+parser.add_argument('--silent', dest='silent', action='store_true', default=False,
+                    help='No error messages')
+
 parser.add_argument('--dump_format', dest='dump_format', type=str, 
                     default="{0:20.20s}\t{1:.3f}\t{2:.6f}\t{3:.6f}\t{4}\t{5}",
                     help='format string where  {0}=name, {1}=distance, {2}=lat, {3}=lon, {4}=bikes, {5}=docks')

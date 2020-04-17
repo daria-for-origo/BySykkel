@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk 
 
+import BySykkelConfig
 import BySykkelModel
 import BySykkelView
 import BySykkelParams
@@ -26,6 +27,9 @@ Enjoy the ride
 '''
 
 args = BySykkelParams.parser.parse_args()
+
+if args.silent:
+    BySykkelConfig.SilentRun = True
 
 mainWindow = tk.Tk()
 

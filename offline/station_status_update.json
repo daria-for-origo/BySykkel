@@ -1,5 +1,5 @@
 {
-  "last_updated": 1540219230,
+  "last_updated": 1540219555,
   "data": {
     "stations": [
       {
@@ -17,12 +17,12 @@
         "num_bikes_available": 1,
         "num_docks_available": 1,
         "last_reported": 1540219230,
-        "is_returning": 1,
+        "is_returning": 0,
         "station_id": "629"
       },
       {
         "is_installed": 1,
-        "is_renting": 1,
+        "is_renting": 0,
         "num_bikes_available": 2,
         "num_docks_available": 2,
         "last_reported": 1540219230,
@@ -37,6 +37,15 @@
         "last_reported": 1540219230,
         "is_returning": 1,
         "station_id": "627"
+      },
+      {
+        "is_installed": 1,
+        "is_renting": 1,
+        "num_bikes_available": 8,
+        "num_docks_available": 8,
+        "last_reported": 1540219230,
+        "is_returning": 1,
+        "station_id": "11"
       }
     ]
   }

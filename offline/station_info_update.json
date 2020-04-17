@@ -1,15 +1,7 @@
 {
-  "last_updated": 1553592653,
+  "last_updated": 1553594999,
   "data": {
     "stations": [
-      {  
-        "station_id":"629",
-        "name":"Lysaker Stasjon ",
-        "address":"Lysaker Stasjon",
-        "lat":59.92266,
-        "lon":10.67889,
-        "capacity":20
-      },
       {  
         "station_id":"627",
         "name":"Skøyen Stasjon",
@@ -33,6 +25,14 @@
         "lat":59.9099822,
         "lon":10.7914482,
         "capacity":20
+      },
+      {  
+        "station_id":"11",
+        "name":"Station 11",
+        "address":"What is 42",
+        "lat":59.909,
+        "lon":10.791,
+        "capacity":25
       }
     ]
   }

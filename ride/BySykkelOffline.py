@@ -1,5 +1,5 @@
 import traceback
-from BySykkelError import print_exception, print_error
+from ride.BySykkelError import print_exception, print_error
 
 '''
 Set of json files in offline/ folder simulates 
@@ -16,10 +16,16 @@ Look for <Offline Test> in the project for more info
 NB! Use --gbfs offline/gbfs.json for offline test
 '''
 
-def get_content(file, client):
+import BySykkelConfig
+
+def get_content(file, client=""):
+
     try:
         f=open(file, "r", encoding='utf-8')
-        return f.read()
+        content = f.read()
+        f.close()
+        return content
     except Exception as ex:
+        ex.args += (file,)
         print_exception(ex, traceback.format_exc())
         return "{}"
