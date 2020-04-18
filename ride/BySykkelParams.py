@@ -1,11 +1,14 @@
+import BySykkelConfig
 import argparse
 
-parser = argparse.ArgumentParser(description='BySykkel Demo App Parameters')
 
-parser.add_argument('--gbfs', dest='gbfs', type=str, default="https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json",
+parser = argparse.ArgumentParser(description='BySykkel Demo App Parameters',
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument('--gbfs', dest='gbfs', type=str, default=BySykkelConfig.OnlineGBFS,
                     help='vei til auto discovery fil')
 
-parser.add_argument('--id', dest='client_id', type=str, default="Daria-Klukin-for-Origo",
+parser.add_argument('--id', dest='client_id', type=str, default=BySykkelConfig.OnlineClientID,
                     help='Client-Identifier for API forespørsel')
 
 parser.add_argument('--bikes', dest='bikes', type=int, default=0,

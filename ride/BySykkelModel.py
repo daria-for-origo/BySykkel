@@ -116,7 +116,8 @@ class StationDict:
     Hence, StationDict is a dictionary for keeping either info or status json per station_id 
     '''
     def __init__(self, js):
-        self.timestamp = js["last_updated"]
+        
+        self.timestamp = js.get("last_updated", 0)
         self.dictionary = dict()
         try:
             for info in js["data"]["stations"]:
@@ -145,28 +146,30 @@ class StationStatus:
         self.bikes = 0
         self.docks = 0
         self.distance = 0 
+        self.id = station_info.get("station_id", 0)
         self.name = station_info.get("name", "")
         self.address = station_info.get("address", "")
         lat = station_info.get("lat", 0)
         lon = station_info.get("lon", 0)
-        self.location = GPSLocation(float(lat), float(lon))
+        self.gps_location = GPSLocation(float(lat), float(lon))
             
     def __str__(self):
         template = "{0}:{1},{2},{3}"
-        return template.format(self.name, self.bikes, self.docks, self.location)
+        return template.format(self.name, self.bikes, self.docks, self.gps_location)
 
     def update_status(self, js):
         self.bikes = js["num_bikes_available"] if js["is_renting"] > 0 else 0  
         self.docks = js["num_docks_available"] if js["is_returning"] > 0 else 0
 
     def update_distance(self, gps_location):
-        self.distance = self.location.distance(gps_location)
+        self.distance = self.gps_location.distance(gps_location)
     
     def sortKey(self):
         return self.distance
 
-    def format(self, template="{0}\t{1}\t{2}\t{3}\t{4}\{5}"):
-        return template.format(self.name, self.distance, self.location.lat, self.location.lon, self.bikes, self.docks)
+    def format(self, template="{0}\t{1}\t{2}\t{3}\t{4}\{5}\t{6}\t{7}"):
+        return template.format(self.name, self.distance, self.gps_location.lat, 
+                               self.gps_location.lon, self.bikes, self.docks, self.id, self.address)
 
     def __str__(self):
         return self.format()
@@ -180,21 +183,12 @@ class Source:
         self.client_id = client_id
         self.gbfs = GbfsInfo(gbfs_url, client_id)
         self.system = SystemInfo(self.gbfs.system_info_url, client_id)
-        self.info = dict()
-        self.status = list()
-        self.status_timestamp = 0
+        self.info = dict() #Station Info and Status merged together
+        self.status = list() #Station Info and Status + calculated distance sorted By distance
+        self.status_timestamp = 0 
         self.info_timestamp = 0
-        self.location = GPSLocation(0,0)
-      
-    def _update_distance(self, gps_location):
-        '''
-        Update user current location
-        '''
-        for s in self.status:
-            s.update_distance(gps_location)
-        self.sort()
-
-    
+        self.gps_location = GPSLocation(0,0)
+        
     def _load_info(self):
         '''
         Loads information from station_information 
@@ -214,7 +208,7 @@ class Source:
             return False
         return True
 
-    def _update_status(self):
+    def _load_status(self):
         '''
         Loads information from station_status 
         return False if no new data has been loaded  
@@ -224,13 +218,13 @@ class Source:
         ss = StationDict(js)
         if (not force_update and ss.timestamp <= self.status_timestamp):
             return False 
-        self.status.clear()
+
         self.status_timestamp = ss.timestamp
-        for key, info in ss.dictionary.items():
+        for key, value in ss.dictionary.items():
             try:
-                s = self.info[key]
-                s.update_status(info)
-                self.status.append(s)
+                self.info[key].update_status(value)
+                if (force_update):
+                    self.info[key].update_distance(self.gps_location)
             except KeyError:
                 continue
             except Exception as ex:
@@ -238,23 +232,38 @@ class Source:
                 print_exception(ex, traceback.format_exc())
                 return False
         return True
-    
+
+
+    def _update_status_sorted_list(self):
+        '''
+        Minimize transition period:
+        Make new status list out of self.info and switch it at once
+        Alt, update status list item by item, check item is removed
+        '''
+        new_status = list()
+        for key, value in self.info.items():
+            new_status.append(value)
+            
+        new_status.sort(key=lambda stationstatus: stationstatus.sortKey())
+        self.status = new_status
+        
+
     def update(self, gps_location):
         '''
         Force the source to update its data
         return False if neither location nor status have been changed  
         '''
 
-        location_changed = self.location != gps_location
-        status_changed = self._update_status()
+        gps_location_changed = self.gps_location != gps_location
+        self.gps_location = gps_location
 
-        if not location_changed and not status_changed:
+        status_changed = self._load_status()
+
+        if not gps_location_changed and not status_changed:
             return False;
 
-        self.location = gps_location
-        self._update_distance(self.location)
-        self.sort()
-       
+        self._update_status_sorted_list()
+
         return True
     
     def sort(self):

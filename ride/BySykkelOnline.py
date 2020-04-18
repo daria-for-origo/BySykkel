@@ -14,11 +14,11 @@ som mittfirma-reiseplanlegger eller mittfirma-bymonitor.
 
 def get_content(url, client_id):
 
-    if client == "":
+    if client_id == "":
         print_error("Mandatory parameter Client-ID is missing")
         return "{}" 
 
-    if len(client) < 7:
+    if len(client_id) < 7:
         print_error("Client-ID is too short")
         return "{}" 
     

@@ -18,6 +18,16 @@ Retrieve city bicycle stands information for public API
 * python(3) ride/main.py --demo
 
 
+## API
+* ride/BySykkelAPI.py presents a (semi)REST-based endpoint for retrieving all or specific station info 
+* Usage: 
+- python(3) ride/BySykkelAPI.py <query>
+- python(3) ride/BySykkelAPI.py --help
+* Examples:
+- python(3) test/API.py
+
+
+
 ## Windows Notes 
 
 * Python 3.6 and up

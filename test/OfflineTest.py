@@ -127,6 +127,15 @@ class TestModelSource(unittest.TestCase):
         self.source = BySykkelModel.Source(BySykkelConfig.OfflineGBFS, "")
         updated = self.source.update(self.gps_loc)
 
+    def trace(self, title) :
+        if not BySykkelConfig.SilentRun:
+            print(title)
+            for it in self.source.status:
+                print(it)
+            print("========")
+
+
+
     def sumBikes(self):
         sum = 0
         for row in self.source.status:
@@ -140,20 +149,23 @@ class TestModelSource(unittest.TestCase):
         return sum
         
     def test_source_init(self):
-        self.assertEqual(len(self.source.status), 3)
+        self.trace("Init")
+        self.assertEqual(len(self.source.status), 4)
         self.assertEqual(self.sumBikes(), 7)
         self.assertEqual(self.sumDocks(), 7)
 
     def test_source_skip_update(self):
         updated = self.source.update(self.gps_loc)
+        self.trace("Skip Update")
         self.assertEqual(updated, False)
         
         
 
     def test_source_update_location(self):
         updated = self.source.update(self.gps_update_loc)
+        self.trace("Update Location")
         self.assertEqual(updated, True)
-        self.assertEqual(len(self.source.status), 3)
+        self.assertEqual(len(self.source.status), 4)
         self.assertEqual(self.sumBikes(), 7)
         self.assertEqual(self.sumDocks(), 7)
         #TODO: Add location change test
@@ -162,8 +174,9 @@ class TestModelSource(unittest.TestCase):
         #Switch to newer version of station_info
         self.source.gbfs.station_info_url = "offline/station_info_update.json"
         updated = self.source.update(self.gps_update_loc)
+        self.trace("Update Info")
         self.assertEqual(updated, True)
-        self.assertEqual(len(self.source.status), 2) #Lysaker is removed from info
+        self.assertEqual(len(self.source.status), 4) #Lysaker is removed from info
         self.assertEqual(self.sumBikes(), 6)
         self.assertEqual(self.sumDocks(), 6)
 
@@ -171,8 +184,9 @@ class TestModelSource(unittest.TestCase):
         #Switch to newer version of station_status
         self.source.gbfs.station_status_url = "offline/station_status_update.json"
         updated = self.source.update(self.gps_loc)
+        self.trace("Update Status")
         self.assertEqual(updated, True)
-        self.assertEqual(len(self.source.status), 3) #Lysaker not returning, 7 Juni not renting 
+        self.assertEqual(len(self.source.status), 4) #Lysaker not returning, 7 Juni not renting 
         self.assertEqual(self.sumBikes(), 5)
         self.assertEqual(self.sumDocks(), 6)
         
@@ -182,8 +196,9 @@ class TestModelSource(unittest.TestCase):
         self.source.gbfs.station_info_url = "offline/station_info_update.json"
         self.source.gbfs.station_status_url = "offline/station_status_update.json"
         updated = self.source.update(self.gps_loc)
+        self.trace("Update Info and Status")
         self.assertEqual(updated, True)
-        self.assertEqual(len(self.source.status), 3) #Lysaker removed Station 11 added
+        self.assertEqual(len(self.source.status), 4) #Lysaker removed Station 11 added
         self.assertEqual(self.sumBikes(), 12)
         self.assertEqual(self.sumDocks(), 14)
 
