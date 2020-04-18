@@ -23,32 +23,29 @@ json_format='{{"station_id":"{6}","name":"{0}","distance":"{1:.3f}","bikes":"{4}
 json_array_start = '{"stations":['
 json_array_end = "]}"
 json_array_element_separator=","
+json_empty_reply="{}"
 
 
-class Execute:
-
-    def request(query_string):
-
-        request = parser.parse_known_args(query_string.replace("?", "?--").split("?"))[0]
-        
-        model = BySykkelModel.Source(BySykkelConfig.OnlineGBFS, request.client_id)
-        model.update(BySykkelModel.GPSLocation.parse(request.gps_location))
-
-        if (request.station_id > 0):
-            if (request.station_id in model.info.keys()): 
-                return model.info[request.station_id].format(json_format)
-            else:
-                return "{}"
-        else: 
-            output = json_array_start       
-            for value in model.status: 
-                if value.bikes >= request.bikes:
-                    if value.docks >= request.docks:
-                        if (len(output) > len(json_array_start)):
-                            output += json_array_element_separator
-                        output += value.format(json_format)
-            output += json_array_end
-            return output
+def request(query_string):
+    request = parser.parse_known_args(query_string.replace("?", "?--").split("?"))[0]
+    
+    model = BySykkelModel.Source(BySykkelConfig.OnlineGBFS, request.client_id)
+    model.update(BySykkelModel.GPSLocation.parse(request.gps_location))
+    if (request.station_id > 0):
+        if (request.station_id in model.info.keys()): 
+            return model.info[request.station_id].format(json_format)
+        else:
+            return json_empty_reply
+    else: 
+        output = json_array_start       
+        for value in model.status: 
+            if value.bikes >= request.bikes:
+                if value.docks >= request.docks:
+                    if (len(output) > len(json_array_start)):
+                        output += json_array_element_separator
+                    output += value.format(json_format)
+        output += json_array_end
+        return output
 
 if __name__ == '__main__':
-    print(Execute.request(sys.argv[1]))
+    print(request(sys.argv[1]))
