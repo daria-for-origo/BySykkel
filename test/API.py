@@ -1,6 +1,6 @@
 import unittest
 
-import ride.BySykkelAPI as BySykkelAPI
+import BySykkelAPI 
 import ride.BySykkelModel as BySykkelModel
 import json
 
