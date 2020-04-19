@@ -119,11 +119,12 @@ class StationDict:
         
         self.timestamp = js.get("last_updated", 0)
         self.dictionary = dict()
-        try:
-            for info in js["data"]["stations"]:
+        for info in js["data"]["stations"]:
+            try:
                 self.dictionary[int(info["station_id"])] = info
-        except Exception as ex:
+            except Exception as ex:
                 print_exception(ex, traceback.format_exc())
+                continue
 
     def printAll(self):
         for id in self.dictionary:
