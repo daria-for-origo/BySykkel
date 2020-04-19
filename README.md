@@ -22,9 +22,13 @@ Retrieve city bicycle stands information for public API
 ## API
 * BySykkelAPI.py presents <del>an amateur</del> preliminary version of REST-based endpoint for retrieving all or specific station info in json format
 #### Usage: 
-* BySykkelAPI.request([query])
+* BySykkelAPI.request("stations")
+* BySykkelAPI.request("stations/id")
+* BySykkelAPI.request("stations?top=k&bikes=n&docks=m&gps=[lat,lon]")
+* BySykkelAPI.request("stations/id/?gps=[lat,lon]")
+
 #### Examples and Test
-* python(3) BySykkelAPI.py "[query]"
+* python(3) BySykkelAPI.py query]
 * python(3) BySykkelAPI.py --help
 * python(3) test/API.py
 
